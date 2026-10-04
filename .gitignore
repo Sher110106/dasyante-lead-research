@@ -1,0 +1,16 @@
+.firecrawl/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.checks/
+.vercel/
+.vercel
+.DS_Store
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0f0d" />
+    <title>Dasyante / Research workspace</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-lockup">
+          <div class="brand-mark">D</div>
+          <div>
+            <p class="brand-name">dasyante</p>
+            <p class="brand-subtitle">lead intelligence</p>
+          </div>
+        </div>
+        <div class="workspace-label">Workspace</div>
+        <nav class="nav-stack" aria-label="Primary navigation">
+          <button class="nav-item active" data-view="research"><span class="nav-dot"></span>Research queue</button>
+          <button class="nav-item" data-view="contacts"><span class="nav-dot muted"></span>Contacts</button>
+          <button class="nav-item" data-view="evidence"><span class="nav-dot muted"></span>Evidence ledger</button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="connection-row"><span class="status-dot"></span><span>Local workspace</span><span class="connection-ping"></span></div>
+          <p>Contact enrichment stays behind the review gate.</p>
+        </div>
+      </aside>
+
+      <main class="main-stage">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Research / workspace</p>
+            <h1>Find the companies<br /><em>already feeling the pain.</em></h1>
+          </div>
+          <div class="topbar-actions">
+            <span class="db-label" id="db-status">dasyante.db</span>
+            <div class="export-actions" aria-label="Downloads">
+              <a class="button button-secondary" href="/api/export?format=json" download="dasyante-leads.json">JSON ↓</a>
+              <a class="button button-secondary" href="/api/export?format=csv" download="dasyante-leads.csv">CSV ↓</a>
+            </div>
+            <button class="button button-primary" id="open-research">Add companies <span>+</span></button>
+          </div>
+        </header>
+
+        <section class="stats-grid" aria-label="Workspace totals">
+          <article class="stat-card"><p class="stat-label">Companies tracked</p><p class="stat-value" id="stat-companies">0</p><p class="stat-note">from the local ledger</p></article>
+          <article class="stat-card"><p class="stat-label">Qualified</p><p class="stat-value accent-text" id="stat-qualified">0</p><p class="stat-note">score and signal threshold</p></article>
+          <article class="stat-card"><p class="stat-label">Ready for review</p><p class="stat-value" id="stat-review">0</p><p class="stat-note">human decision required</p></article>
+          <article class="stat-card stat-card-dark"><p class="stat-label">Average score</p><p class="stat-value" id="stat-average">0<span>/100</span></p><p class="stat-note">evidence weighted</p></article>
+        </section>
+
+        <section class="work-grid">
+          <div class="queue-panel panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Signal queue</p>
+                <h2>Companies to inspect</h2>
+              </div>
+              <div class="filter-row" role="tablist" aria-label="Candidate filters">
+                <button class="filter active" data-filter="all">All</button>
+                <button class="filter" data-filter="qualified">Qualified</button>
+                <button class="filter" data-filter="reviewed">Reviewed</button>
+              </div>
+            </div>
+            <div class="queue-list" id="candidate-list"></div>
+          </div>
+
+          <aside class="detail-panel panel" id="detail-panel" aria-live="polite">
+            <div class="empty-detail">
+              <div class="empty-orbit">+</div>
+              <p class="eyebrow">Select a company</p>
+              <h2>Evidence before outreach.</h2>
+              <p>Choose a row to inspect the signals, source quotes, and contact gate.</p>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="research-modal" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="research-title">
+        <div class="modal-header"><div><p class="eyebrow">New research run</p><h2 id="research-title">Bring in a company list</h2></div><button class="icon-button" data-close="research-modal" aria-label="Close">×</button></div>
+        <p class="modal-copy">Paste a CSV with <code>company_name</code> and <code>website</code>. Apollo adds company context first, then Tavily and TinyFish research up to two allowlisted pages and score the evidence.</p>
+        <label class="field-label" for="research-csv">Candidate CSV</label>
+        <textarea class="code-input" id="research-csv" spellcheck="false">company_name,website,linkedin_url
+</textarea>
+        <div class="research-options">
+          <label><input type="checkbox" id="skip-apollo" /> Skip Apollo profiles (no Apollo credits)</label>
+          <label><input type="checkbox" id="refresh-apollo" /> Refresh Apollo profiles (bypass cache)</label>
+          <p class="profile-note">Profiles are cached for 7 days. Allow up to one Apollo credit per uncached company. Contact lookup remains behind review.</p>
+        </div>
+        <div class="modal-footer"><span class="modal-hint">Apollo → Tavily + TinyFish</span><button class="button button-primary" id="run-research">Run research <span>→</span></button></div>
+        <div class="inline-message" id="research-message"></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="contacts-modal" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="contacts-title">
+        <div class="modal-header"><div><p class="eyebrow">Manual enrichment</p><h2 id="contacts-title">Import Apollo contacts</h2></div><button class="icon-button" data-close="contacts-modal" aria-label="Close">×</button></div>
+        <p class="modal-copy">Paste the Apollo UI CSV for this reviewed company. Missing emails can be resolved through Hunter when its key is configured.</p>
+        <label class="field-label" for="contacts-csv">Contact CSV</label>
+        <textarea class="code-input" id="contacts-csv" spellcheck="false">domain,first_name,last_name,title,email
+</textarea>
+        <div class="modal-footer"><span class="modal-hint">CSV only. No Apollo API call.</span><button class="button button-primary" id="run-import">Import contacts <span>→</span></button></div>
+        <div class="inline-message" id="contacts-message"></div>
+      </section>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
